@@ -1,4 +1,4 @@
-def yield_generation_jobs(raw_feature_path, train_dir, retrival_path):
+def yield_generation_jobs(raw_feature_path, train_dir, retrival_path, number_runs):
     retrieval_df = pd.read_csv(retrival_path)
 
     try:
@@ -8,7 +8,7 @@ def yield_generation_jobs(raw_feature_path, train_dir, retrival_path):
 
     print(current_answers_saved.head())
 
-    for run_nr in list(range(1,31)):  
+    for run_nr in list(range(1, number_runs+1)):  
         run_nr = str(run_nr)
         train_file_name = f"train_{run_nr}.csv"
         print(f'Check {train_file_name}')

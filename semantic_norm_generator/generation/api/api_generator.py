@@ -14,14 +14,16 @@ class APIGenerator():
         output_dir,
         model,
         train_dir,
-        retrieval_path
+        retrieval_path,
+        number_runs
     ):
+        self.number_runs = number_runs
 
     def run(self):
         output_dir = self.output_dir
         model = self.model
         data_path = f'{output_dir}/encoded_answers_openai.csv'
-        train_dir = self..train_dir 
+        train_dir = self.train_dir 
         retrival_path = self.retrival_path
 
         #must use Manager queue here, or will not work
@@ -43,7 +45,7 @@ class APIGenerator():
             jobs.append(job)
 
         # create jobs
-        for job in yield_generation_jobs(data_path, train_dir, retrival_path):
+        for job in yield_generation_jobs(data_path, train_dir, retrival_path, self.number_runs):
             job_queue.put(job)
 
         for _ in jobs:

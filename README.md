@@ -9,5 +9,5 @@ python -m semantic_norm_generator generate --output_dir=. --train_dir=train --re
 
 ## Decoding
 ```
-python -m semantic_norm_generator decode --answers=feature_norm_from_gpt.csv --output=. --parallel
+python -m semantic_norm_generator decode --answers=raw_feature_norm_from_gpt.csv --output=. --parallel
 ```

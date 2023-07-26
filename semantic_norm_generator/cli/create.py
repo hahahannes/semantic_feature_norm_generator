@@ -13,3 +13,4 @@ class CreateCommand():
         parser.add_argument("--retrival_path", dest='retrival_path')
         parser.add_argument("--model", dest='model')
         parser.add_argument("--model_source", dest='model_source')
+        parser.add_argument("--number_runs", dest='number_runs')
