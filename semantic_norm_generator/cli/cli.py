@@ -29,7 +29,7 @@ def get_argument_parser() -> argparse.ArgumentParser:
     for command in COMMANDS:
         assert command.__class__.__name__.endswith("Command")
         name = command.__class__.__name__[: -len("Command")].lower()
-        print(name)
+
         command_parser = subparsers.add_parser(
             name#, help=command.__doc__, epilog=_EPILOG
         )

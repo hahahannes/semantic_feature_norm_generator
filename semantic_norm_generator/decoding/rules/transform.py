@@ -1,4 +1,5 @@
-import utils.decoding.helper as helper
+from semantic_norm_generator.decoding import helper as helper
+
 import spacy
 import mlconjug3
 import json 

@@ -1,3 +1,5 @@
+from .api_generator import APIGenerator
+
 import openai
 
 class GPTGenerator(APIGenerator):

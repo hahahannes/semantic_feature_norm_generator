@@ -31,8 +31,8 @@ class LLMGenerator():
 
         if model == 'falcon':
             model_path = '../falcon-40b'
-        elif model == 'llama:
-            pass'
+        elif model == 'llama':
+            pass
 
         print("load tokenizer")
         tokenizer = AutoTokenizer.from_pretrained(

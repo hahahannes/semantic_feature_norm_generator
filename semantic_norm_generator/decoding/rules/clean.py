@@ -1,4 +1,5 @@
-import helper as helper
+from semantic_norm_generator.decoding import helper as helper
+
 import spacy
 nlp = spacy.load('en_core_web_sm')
 
