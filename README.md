@@ -25,7 +25,14 @@ optional arguments:
 
 ### Example
 ```
-python -m semantic_norm_generator generate --output_dir=. --train_dir=train --retrival_path=priming.csv --model-source=gpt --model=gpt3-davinci
+python -m semantic_norm_generator generate --output_dir=. --train_dir=doc/priming --retrival_path=doc/concepts.csv --model-source=gpt --model=gpt3-davinci
+```
+
+### API Keys
+If you want to use commercial APIs, e.g. from OpenAI or Anthropic, you need to have an API Key and make it accessible to the tool.
+For example by setting the environment variable `OPENAI_API_KEY` or `ANTHROPIC_API_KEY`.
+```
+OPENAI_API_KEY=key python -m semantic_norm_generator --help
 ```
 
 ## Decoding
