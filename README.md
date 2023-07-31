@@ -47,6 +47,8 @@ OPENAI_API_KEY=key python -m semantic_norm_generator --help
 ```
 
 ## Decoding
+The creation command will create a file containing all the raw text completions from the LLM. To create a feature norm, run `decode` command which will strip off unnecessary pronouns, clean mistakes and transform features. 
+
 ```bash
 usage: python -m semantic_norm_generator decode [-h] [--answers ANSWERS] [--output OUTPUT] [--parallel] [--lemmatize] [--keep_duplicates_per_concept]
 
