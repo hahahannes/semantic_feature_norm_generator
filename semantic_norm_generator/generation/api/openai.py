@@ -1,10 +1,26 @@
 from .api_generator import APIGenerator
+from semantic_norm_generator.generation.priming import generate_single_prime_sentence
 
 import openai
 
 class GPTGenerator(APIGenerator):
-    def __init__(self):
-        super().__init__()
+    def __init__(
+        self,
+        output_dir,
+        model,
+        train_dir,
+        retrieval_path,
+        number_runs,
+        number_of_parallel_jobs
+    ):
+        super().__init__(
+            output_dir,
+            model,
+            train_dir,
+            retrieval_path,
+            number_runs,
+            number_of_parallel_jobs
+        )
 
     def generate_chat_priming_messages(self, train_df, question):
         questions = []
@@ -49,11 +65,13 @@ class GPTGenerator(APIGenerator):
 
     def make_request(self, train_df, model, question):
         if model == 'gpt-3.5-turbo' or model == 'gpt-3.5-turbo-0301' or model == 'gpt-4':
-            messages = generate_chat_priming_messages(train_df, question)
+            messages = self.generate_chat_priming_messages(train_df, question)
             response = openai.ChatCompletion.create(model=model, messages=messages, temperature=0.5, frequency_penalty=0.33, max_tokens=70, n=1)
             response_text = response['choices'][0]['message']['content']
         else:
             priming_text = generate_single_prime_sentence(train_df, question)
             response = openai.Completion.create(engine=model, prompt=priming_text, temperature=0.5, frequency_penalty=0.33, max_tokens=70, n=1)
             response_text = response['choices'][0]['text']
+
+
         return response_text

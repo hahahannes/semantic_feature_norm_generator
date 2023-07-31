@@ -1,4 +1,4 @@
-def generate_single_prime_sentence(self, train_df, question):
+def generate_single_prime_sentence(train_df, question):
     priming_text = ''
     for row in train_df:
         priming_text += row[0]

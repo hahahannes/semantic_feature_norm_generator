@@ -12,7 +12,8 @@ def run(args):
             args.model,
             args.train_dir,
             args.retrieval_path,
-            args.number_runs
+            args.number_runs,
+            args.number_of_parallel_jobs
         ).run()
     elif model_source == 'claude':
         ClaudeGenerator(
@@ -20,7 +21,8 @@ def run(args):
             args.model,
             args.train_dir,
             args.retrieval_path,
-            args.number_runs
+            args.number_runs,
+            args.number_of_parallel_jobs
         ).run()
     elif model_source == 'local':
         LLMGenerator(

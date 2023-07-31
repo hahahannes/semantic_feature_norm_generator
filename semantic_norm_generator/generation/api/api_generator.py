@@ -15,33 +15,39 @@ class APIGenerator():
         model,
         train_dir,
         retrieval_path,
-        number_runs
+        number_runs,
+        number_of_parallel_jobs
     ):
         self.number_runs = number_runs
+        self.output_dir = output_dir
+        self.model = model
+        self.train_dir = train_dir
+        self.retrieval_path = retrieval_path
+        self.number_of_parallel_jobs = number_of_parallel_jobs
 
     def run(self):
         output_dir = self.output_dir
         model = self.model
         data_path = f'{output_dir}/encoded_answers_openai.csv'
         train_dir = self.train_dir 
-        retrival_path = self.retrival_path
+        retrival_path = self.retrieval_path
+        number_of_parallel_jobs = self.number_of_parallel_jobs
 
         #must use Manager queue here, or will not work
         manager = mp.Manager()
         output_queue = manager.Queue()    
         job_queue  = manager.Queue()  
-        n_jobs = 3 #mp.cpu_count()
-        pool = mp.Pool(n_jobs)
+        pool = mp.Pool(number_of_parallel_jobs)
 
         #put ouput listener to work first
         print('Start Output Writer')
-        watcher = pool.apply_async(listener, (output_queue, data_path))
+        watcher = pool.apply_async(self.listener, (output_queue, data_path))
 
         #fire off workers
         print('Start Workers')
         jobs = []
-        for i in range(n_jobs):
-            job = pool.apply_async(worker, (i, job_queue, output_queue, model))
+        for i in range(number_of_parallel_jobs):
+            job = pool.apply_async(self.worker, (i, job_queue, output_queue, model))
             jobs.append(job)
 
         # create jobs
@@ -78,8 +84,8 @@ class APIGenerator():
 
             priming = job['priming']
             question = job['question']
-            answer = make_request(priming, model, question)
-            answer = escape_answer(answer)
+            answer = self.make_request(priming, model, question)
+            answer = self.escape_answer(answer)
             job['answer'] = answer
             output_queue.put(job)
         return True 

@@ -4,8 +4,23 @@ import anthropic
 from .api_generator import APIGenerator
 
 class ClaudeGenerator(APIGenerator):
-    def __init__(self):
-        super().__init__()
+    def __init__(
+        self,
+        output_dir,
+        model,
+        train_dir,
+        retrieval_path,
+        number_runs,
+        number_of_parallel_jobs
+    ):
+        super().__init__(
+            output_dir,
+            model,
+            train_dir,
+            retrieval_path,
+            number_runs,
+            number_of_parallel_jobs
+        )
 
     def generate_single_prime_sentence(self, train_df, question):
         priming_text = f"{anthropic.HUMAN_PROMPT} Answer the last question. Use the same syntax."
@@ -28,7 +43,7 @@ class ClaudeGenerator(APIGenerator):
 
     def make_request(self, train_df, model, question):
         client = anthropic.Client(os.environ['ANTHROPIC_API_KEY'])
-        prompt = generate_single_prime_sentence(train_df, question)
+        prompt = self.generate_single_prime_sentence(train_df, question)
 
         response = client.completion(
             prompt=prompt,

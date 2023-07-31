@@ -1,4 +1,7 @@
+import pandas as pd 
+
 def yield_generation_jobs(raw_feature_path, train_dir, retrival_path, number_runs):
+    print(retrival_path)
     retrieval_df = pd.read_csv(retrival_path)
 
     try:
