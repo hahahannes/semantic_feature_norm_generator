@@ -33,7 +33,7 @@ optional arguments:
 
 ### Example
 ```
-python -m semantic_norm_generator create --output_dir=. --train_dir=doc/priming --retrieval_path=doc/concepts.csv --model_source=gpt --model=davinci --number_runs=1 --number_of_parallel_jobs=2
+python -m semantic_norm_generator create --output_dir=. --train_dir=doc/mcrae_priming --retrieval_path=doc/concepts.csv --model_source=gpt --model=davinci --number_runs=1 --number_of_parallel_jobs=2
 ```
 
 ### Priming
