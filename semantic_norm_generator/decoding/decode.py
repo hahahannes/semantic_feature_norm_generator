@@ -95,13 +95,12 @@ def filter_two_occ(run_nrs):
     amount_run_features_occured = len(set(run_nrs))
     return amount_run_features_occured
 
-def decode_answers(answers_df, lemmatize, parallel, keep_duplicates_per_concept, output_dir):
+def decode_answers(answers_df, lemmatize, number_of_parallel_jobs, keep_duplicates_per_concept, output_dir):
     decoded_rows = []
     rules_changes = []
 
-    if parallel:
-        n = 30
-        dfs = np.array_split(answers_df, n)
+    if number_of_parallel_jobs > 1:
+        dfs = np.array_split(answers_df, number_of_parallel_jobs)
         with concurrent.futures.ProcessPoolExecutor(max_workers=n) as executor:
             future = [executor.submit(decode_batch, df, i, lemmatize) for i, df in enumerate(dfs)]
             for future in concurrent.futures.as_completed(future):
@@ -114,11 +113,9 @@ def decode_answers(answers_df, lemmatize, parallel, keep_duplicates_per_concept,
     
     print('Decoding done')
     df = pd.DataFrame(decoded_rows)
-    print(df)
     
     # Drop duplicates of a feature within a concept and within a run -> same as when one human would write a feature twice 
     df = df.drop_duplicates(['concept_id', 'decoded_feature', 'run_nr'])
-    print(df)
 
     # Sum amount of runs where the feature occured
     df['amount_runs_feature_occured'] = df['run_nr'].groupby(df['decoded_feature']).transform(filter_two_occ)
