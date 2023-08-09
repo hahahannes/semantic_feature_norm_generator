@@ -37,7 +37,7 @@ python -m semantic_norm_generator create --output_dir=. --train_dir=doc/mcrae_pr
 ```
 
 ### Models
-The `model` parameter corresponds either to the model name from an API or the name of Huggingface model or the path to weights downloaded from Huggingface. Possible model names from OPENAI can be found here: https://platform.openai.com/docs/models/overview. For example use `davinci` if you want to use the GPT-3 davinci model. 
+The `model` parameter corresponds either to the model name from an API or the name of Huggingface model or the path to weights downloaded from Huggingface. Possible model names from OPENAI can be found here: https://platform.openai.com/docs/models/overview. For example use `davinci` if you want to use the GPT-3 davinci model.  Possible models from Anthropic can be found here: https://docs.anthropic.com/claude/reference/selecting-a-model
 
 ### Concepts/Objects/Words
 `retrieval_path` specifies the path to the file containing your target concepts/words/objects for which you want to generate semantic features.

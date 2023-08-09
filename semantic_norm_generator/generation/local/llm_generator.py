@@ -64,7 +64,7 @@ class LLMGenerator():
         print("Run Generation")
         start = time.time()
 
-        with open(self.raw_feature_path, 'a+') as f:
+        with open(self.raw_feature_path, 'a') as f:
             for job in yield_generation_jobs(self.raw_feature_path, self.train_dir, self.retrival_path, self.number_runs):
                 priming = job['priming']
                 question = job['question']
@@ -91,3 +91,9 @@ class LLMGenerator():
                 text = f'{concept},"{answer}",{concept_id},{run_nr}'
                 f.write(text + '\n')
                 f.flush()
+
+    # TODO 
+    def initialize_output_file(self):
+        if not os.path.exist(self.raw_feature_path):
+            with open(self.raw_feature_path, "w") as out_file:
+                out_file.write("concept,answer,concept_id,run_nr")

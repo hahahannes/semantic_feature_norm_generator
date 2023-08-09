@@ -50,5 +50,6 @@ class ClaudeGenerator(APIGenerator):
             stop_sequences = [anthropic.HUMAN_PROMPT],
             model=model,
             max_tokens_to_sample=80,
+            temperature=0.5
         )
         return response['completion']
