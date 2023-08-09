@@ -6,9 +6,10 @@ pip install -e .
 ```
 
 # Usage
-The following examples use files from the `doc` directory. Either change the path or run the examples in this directory.
 
 ## Generation
+If you want to generate semantic features for arbitrary words/objects/concepts, you can use the following command. The LLM needs to be primed with examples in order to generate semantic features. You will also need a list of words that you want to generate features for. 
+
 ```bash
 usage: python -m semantic_norm_generator create [-h] [--output_dir OUTPUT_DIR] [--train_dir TRAIN_DIR] [--retrival_path RETRIVAL_PATH]
                           [--model {gpt3-davinci,gpt-3.5-turbo,gpt-4,gpt-3.5-turbo-0301}] [--model_source {gpt,local,claude}] [--number_runs NUMBER_RUNS] [--number_of_parallel_jobs NUMBER_OF_PARALLEL_JOBS]
@@ -32,6 +33,7 @@ optional arguments:
 ```
 
 ### Example
+The following example uses files from the `doc` directory. Either change the path or run the examples in this directory.
 ```
 python -m semantic_norm_generator create --output_dir=. --train_dir=doc/mcrae_priming --retrieval_path=doc/concepts.csv --model_source=gpt --model=davinci --number_runs=1 --number_of_parallel_jobs=2
 ```
@@ -40,7 +42,7 @@ python -m semantic_norm_generator create --output_dir=. --train_dir=doc/mcrae_pr
 The `model` parameter corresponds either to the model name from an API or the name of Huggingface model or the path to weights downloaded from Huggingface. Possible model names from OPENAI can be found here: https://platform.openai.com/docs/models/overview. For example use `davinci` if you want to use the GPT-3 davinci model.  Possible models from Anthropic can be found here: https://docs.anthropic.com/claude/reference/selecting-a-model
 
 ### Concepts/Objects/Words
-`retrieval_path` specifies the path to the file containing your target concepts/words/objects for which you want to generate semantic features.
+`retrieval_path` specifies the path to the file containing your target concepts/words/objects for which you want to generate semantic features. See the example file in `doc/concepts.csv` for the exptected structure. The question for each words should be in the format of `What are the properties of [WORD]`. Keep singular/plural forms in mind!
 
 ### Priming
 Note, that the files in the `train_dir` directory need to be named `train_{i}.csv` where `i` specifies the run number. It is recommended to use multiple priming initializations to create more diverse features. Counting starts with `1`. For example, create two files `train_1.csv` and `train_2.csv` if you want to create features with two different primings.
@@ -69,6 +71,7 @@ optional arguments:
                         Keep duplicated features per concept
 ```
 ### Example
+The following example uses files from the `doc` directory. Either change the path or run the examples in this directory.
 ```
 python -m semantic_norm_generator decode --answers=raw_feature_norm_from_gpt.csv --output=. --parallel
 ```
