@@ -53,13 +53,12 @@ class LLMGenerator():
             model=model,
             tokenizer=self.tokenizer,
             #torch_dtype=torch.bfloat16,
-            trust_remote_code=True
+            trust_remote_code=True,
+            device_map="auto"
         )
 
     def run(self):
         print("Run Generation")
-
-        self.initialize_output_file()
         
         start = time.time()
 
@@ -86,13 +85,15 @@ class LLMGenerator():
                 end = time.time()
                 print(end-start)
 
-                answer = sequences[0]['generated_text']
+                answer = sequences[0]['generated_text'].split(question, 1)[1]
                 print(f"Result: {answer}")
 
                 text = f'{concept},"{answer}",{concept_id},{run_nr}'
                 f.write(text + '\n')
                 f.flush()
 
+    # TODO nicht noetig da beim einlesen 
+    # spaeter vllt lieber hier machen und bei generation_jobs rausnehmen
     def initialize_output_file(self):
         if not os.path.exists(self.raw_feature_path):
             with open(self.raw_feature_path, "w") as out_file:
