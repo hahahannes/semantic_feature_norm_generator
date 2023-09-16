@@ -8,6 +8,7 @@ def yield_generation_jobs(raw_feature_path, train_dir, retrival_path, number_run
     except IOError:
         current_answers_saved = pd.DataFrame({'concept_id': [], 'run_nr': [], 'answer': []})
 
+    print("Peek at already saved completions:")
     print(current_answers_saved.head())
 
     for run_nr in list(range(1, number_runs+1)):  
