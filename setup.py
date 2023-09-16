@@ -10,6 +10,8 @@ setup(
         "openai==0.27.8",
         "spacy==3.6.0",
         "mlconjug==3.4.0",
-        "anthropic==0.3.6"
+        "anthropic==0.3.6",
+        "inflect",
+        "mlconjug3"
     ],
 )

@@ -1,9 +1,7 @@
 from semantic_norm_generator.decoding import helper as helper
 
-import spacy
-nlp = spacy.load('en_core_web_sm')
 
-def rule_remove_properties_quesion(feature, concept):
+def rule_remove_properties_quesion(feature, concept, nlp):
     if 'What are the properties' in feature:
         return False
     return True
@@ -13,7 +11,7 @@ def rule_remove_underscores(feature, concept):
         return False
     return True
 
-def rule_remove_one_word_features(feature, concept):
+def rule_remove_one_word_features(feature, concept, nlp):
     list_of_words = helper.tokenize(feature)
     tagged_feature = nlp(feature)
 
@@ -23,23 +21,23 @@ def rule_remove_one_word_features(feature, concept):
         return False
     return True
 
-def rule_remove_question_marks(feature, concept):
+def rule_remove_question_marks(feature, concept, nlp):
     if '?' in feature:
         return False
     return True
 
-def rule_remove_not_pronom(feature, concept):
+def rule_remove_not_pronom(feature, concept, nlp):
     tagged_feature = nlp(feature)
     if tagged_feature[0].tag_ != 'PRP':
         return False
     return True
 
-def rule_remove_non_ascii(feature, concept):
+def rule_remove_non_ascii(feature, concept, nlp):
     if not feature.isascii():
         return False
     return True
 
-def remove_same_noun(feature, concept):
+def remove_same_noun(feature, concept, nlp):
     tagged_feature = nlp(feature)
     if len(tagged_feature) >= 3:
         if tagged_feature[0].lemma_ == 'be' and tagged_feature[2].text == concept:

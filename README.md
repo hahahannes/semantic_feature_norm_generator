@@ -70,6 +70,10 @@ optional arguments:
   --keep_duplicates_per_concept
                         Keep duplicated features per concept
 ```
+### Requirements
+You need to download and install the `spacy` language model.
+```python -m spacy download en_core_web_sm`
+
 ### Example
 The following example uses files from the `doc` directory. Either change the path or run the examples in this directory.
 ```

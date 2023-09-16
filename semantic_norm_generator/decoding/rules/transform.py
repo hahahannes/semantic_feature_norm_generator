@@ -4,11 +4,10 @@ import spacy
 import mlconjug3
 import json 
 
-nlp = spacy.load('en_core_web_sm')
 default_conjugator = mlconjug3.Conjugator(language='en')
 
 
-def rule_remove_pronom(feature):
+def rule_remove_pronom(feature, nlp):
     if feature:
         tagged_feature = nlp(feature)
         list_of_words = helper.tokenize(feature)
@@ -27,7 +26,7 @@ def rule_remove_pronom(feature):
     return feature
 
 
-def rule_remove_but(feature):
+def rule_remove_but(feature, nlp):
     list_of_words = helper.tokenize(feature)
     if list_of_words and 'but' in list_of_words:
         i = list_of_words.index('but')
@@ -35,7 +34,7 @@ def rule_remove_but(feature):
         feature = helper.combine_feature_list_to_string(list_of_words)
     return feature
 
-def rule_remove_when(feature):
+def rule_remove_when(feature, nlp):
     list_of_words = helper.tokenize(feature)
     if list_of_words and 'when' in list_of_words:
         i = list_of_words.index('when')
@@ -43,7 +42,7 @@ def rule_remove_when(feature):
         feature = helper.combine_feature_list_to_string(list_of_words)
     return feature
 
-def rule_remove_if(feature):
+def rule_remove_if(feature, nlp):
     list_of_words = helper.tokenize(feature)
     if list_of_words and 'if' in list_of_words:
         i = list_of_words.index('if')
@@ -51,7 +50,7 @@ def rule_remove_if(feature):
         feature = helper.combine_feature_list_to_string(list_of_words)
     return feature
 
-def rule_remove_that(feature):
+def rule_remove_that(feature, nlp):
     list_of_words = helper.tokenize(feature)
     tagged_feature = nlp(feature)
     if list_of_words and 'that' in list_of_words:
@@ -65,7 +64,7 @@ def rule_remove_that(feature):
 
     return feature
 
-def rule_remove_which(feature):
+def rule_remove_which(feature, nlp):
     list_of_words = helper.tokenize(feature)
     tagged_feature = nlp(feature)
     if list_of_words and 'which' in list_of_words:
@@ -76,7 +75,7 @@ def rule_remove_which(feature):
             feature = helper.combine_feature_list_to_string(list_of_words)
     return feature
 
-def remove_such_as(feature):
+def remove_such_as(feature, nlp):
     # it is big such as -> it is big
     list_of_words = helper.tokenize(feature)
     if list_of_words and 'such' in list_of_words:
@@ -89,7 +88,7 @@ def remove_such_as(feature):
             feature = helper.combine_feature_list_to_string(list_of_words)
     return feature
 
-def remove_parenthesis(feature):
+def remove_parenthesis(feature, nlp):
     # it is (some) big -> it is big
     list_of_words = helper.tokenize(feature)
     if list_of_words and '(' in list_of_words:
@@ -103,7 +102,7 @@ def remove_parenthesis(feature):
         feature = helper.combine_feature_list_to_string(list_of_words)
     return feature
 
-def rule_change_can(feature):
+def rule_change_can(feature, nlp):
     # it can be red -> it is red 
     list_of_words = helper.tokenize(feature)
     tagged_feature = nlp(feature)
@@ -122,7 +121,7 @@ def rule_change_can(feature):
             feature = helper.combine_feature_list_to_string(list_of_words)
     return feature
 
-def remove_stopwords(feature):
+def remove_stopwords(feature, nlp):
     # is is usually big -> it is big
     list_of_words = helper.tokenize(feature)
     stopwords = ['also', 'usually', 'very', 'really']
@@ -133,7 +132,7 @@ def remove_stopwords(feature):
     feature = helper.combine_feature_list_to_string(list_of_words)
     return feature
 
-def used(feature):
+def used(feature, nlp):
     # used for hunting -> used to hunt
     # can be used to
     # is used to move -> used to move
@@ -156,7 +155,7 @@ def used(feature):
         feature = helper.combine_feature_list_to_string(list_of_words)
     return feature
 
-def replace_digits(feature):
+def replace_digits(feature, nlp):
     # it has 1 wheel -> it has one wheel
     list_of_words = helper.tokenize(feature)
     numbers = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten']
@@ -168,7 +167,7 @@ def replace_digits(feature):
     feature = helper.combine_feature_list_to_string(list_of_words)
     return feature
 
-def replace_apostrophe(feature):
+def replace_apostrophe(feature, nlp):
     # it's big -> it is big
     list_of_words = helper.tokenize(feature)
     tagged_feature = nlp(feature)
@@ -183,7 +182,7 @@ def replace_apostrophe(feature):
     feature = helper.combine_feature_list_to_string(list_of_words)
     return feature
 
-def replace_plural_be_have(feature):
+def replace_plural_be_have(feature, nlp):
     # 'moves' -> 'moves'
     # 'move' -> 'moves'
     # 'are green' -> 'is green'
@@ -198,7 +197,7 @@ def replace_plural_be_have(feature):
     feature = helper.combine_feature_list_to_string(list_of_words)
     return feature
 
-def replace_british(feature):
+def replace_british(feature, nlp):
     list_of_words = helper.tokenize(feature)
 
     with open('../data/british_to_american.json') as vocab_file:
@@ -213,7 +212,7 @@ def replace_british(feature):
     feature = helper.combine_feature_list_to_string(list_of_words)
     return feature
 
-def remove_kind_of(feature):
+def remove_kind_of(feature, nlp):
     # is a kind of clothing -> is a clothing
     # are a kind of pants -> are pants
     list_of_words = helper.tokenize(feature)

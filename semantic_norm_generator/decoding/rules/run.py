@@ -1,7 +1,7 @@
 from . import clean, extraction, transform
 from copy import deepcopy
 
-def transform_feature(feature, concept_id):
+def transform_feature(feature, concept_id, nlp):
     rules = [
         # Removing apostrophe should be first -> it's -> is       
         ('replace_apos', transform.replace_apostrophe),
@@ -27,14 +27,14 @@ def transform_feature(feature, concept_id):
     
         for rule in rules:
             feature_copy = deepcopy(feature)
-            feature = rule[1](feature_copy)
+            feature = rule[1](feature_copy, nlp)
             if feature_copy != feature: 
                 rule_changes.append([feature_copy, deepcopy(feature), rule[0], concept_id])
         
         return feature, rule_changes
     return '', []
 
-def extract_combinations(feature, concept_id):
+def extract_combinations(feature, concept_id, nlp):
     all_new_features = []
     all_rule_changes = []
     rules = [
@@ -54,7 +54,7 @@ def extract_combinations(feature, concept_id):
         for rule in rules:
             rule_name = rule[0]
             extracted_features = None
-            extracted_features = rule[1](feature)
+            extracted_features = rule[1](feature, nlp)
                 
             if extracted_features:
                 new_features += extracted_features
@@ -78,7 +78,7 @@ def extract_combinations(feature, concept_id):
     all_new_features = list(set(all_new_features))
     return all_new_features, all_rule_changes
 
-def clean_feature(feature, concept_id):
+def clean_feature(feature, concept_id, nlp):
     concept = concept_id.replace('_', ' ')
     concept = ''.join([i for i in concept if not i.isdigit()])
     keep_feature = True
@@ -95,7 +95,7 @@ def clean_feature(feature, concept_id):
     old_feature = deepcopy(feature)
 
     for rule in rules:
-        keep_feature = rule[1](feature, concept)
+        keep_feature = rule[1](feature, concept, nlp)
         if not keep_feature:
             change = [old_feature, '', rule[0], concept_id]
             rule_changes.append(change)
@@ -103,22 +103,22 @@ def clean_feature(feature, concept_id):
     return keep_feature, rule_changes
 
 
-def run_rules(preprocessed_feature, concept_id):
+def run_rules(preprocessed_feature, concept_id, nlp):
     decoded_features = []
     rule_changes = []
 
-    keep_feature, clean_rule_changes = clean_feature(preprocessed_feature, concept_id)
+    keep_feature, clean_rule_changes = clean_feature(preprocessed_feature, concept_id, nlp)
     rule_changes += clean_rule_changes
     if keep_feature:
-        extracted_features, extraction_rule_changes = extract_combinations(preprocessed_feature, concept_id)
+        extracted_features, extraction_rule_changes = extract_combinations(preprocessed_feature, concept_id, nlp)
         rule_changes += extraction_rule_changes
         if not extracted_features:
             extracted_features.append(preprocessed_feature)
 
         for feature in extracted_features:
-            new_feature, feature_rule_changes = transform_feature(feature, concept_id) 
+            new_feature, feature_rule_changes = transform_feature(feature, concept_id, nlp) 
             rule_changes += feature_rule_changes
-            not_single_word = clean.rule_remove_one_word_features(feature, concept_id)
+            not_single_word = clean.rule_remove_one_word_features(feature, concept_id, nlp)
             not_is_noun = clean.remove_same_noun(feature, concept_id)
             if not not_single_word:
                 rule_changes.append([new_feature, '', 'remove_single_word', concept_id])

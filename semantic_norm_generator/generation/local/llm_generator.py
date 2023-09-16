@@ -1,6 +1,7 @@
 import os
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"   # see issue #152
 os.environ["CUDA_VISIBLE_DEVICES"]="0,1,2,3"
+from os.path import join as pjoin
 import time
 
 from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
@@ -14,7 +15,7 @@ class LLMGenerator():
     def __init__(
         self,
         output_dir,
-        model,
+        model_name_or_path,
         train_dir,
         retrieval_path,
         number_runs
@@ -25,24 +26,19 @@ class LLMGenerator():
         self.raw_feature_path = f'{output_dir}/raw_completions.csv'
         self.number_runs = number_runs
 
-        print(torch.cuda.is_available())
-        print(torch.cuda.device_count())
-        print(torch.cuda.current_device())
-
-        if model == 'falcon':
-            model_path = '../falcon-40b'
-        elif model == 'llama':
-            pass
+        print(f"CUDA available: {torch.cuda.is_available()}")
+        print(f"Number GPUs: {torch.cuda.device_count()}")
+        print(f"Current Device: {torch.cuda.current_device()}")
 
         print("load tokenizer")
         tokenizer = AutoTokenizer.from_pretrained(
-            model_path, 
+            model_name_or_path, 
             trust_remote_code=True
         )
 
         print("load model")
         model = AutoModelForCausalLM.from_pretrained(
-            model_path, 
+            model_name_or_path, 
             trust_remote_code=True, 
             device_map="auto", 
             load_in_4bit=True,

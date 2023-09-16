@@ -6,8 +6,6 @@ import concurrent.futures
 from .rules.run import run_rules
 from .synonyms import find_synonyms
 
-nlp = spacy.load('en_core_web_sm')
-
 def decode_answer_sentence(sentence):
     sentence = sentence.split('.')[0]
     features = sentence.split(',')
@@ -49,7 +47,7 @@ def create_rule_dfs_and_save(rule_changes, output_dir):
         df.to_csv('%s/rules/%s.csv' % (output_dir, rule), index=False)
 
 
-def split_and_decode_answer(answer, concept_id, run_nr, lemmatize):
+def split_and_decode_answer(answer, concept_id, run_nr, lemmatize, nlp):
     decoded_feature_list = []
     rules_list = []
     splitted_features = split_answer_sentence(answer)
@@ -57,7 +55,7 @@ def split_and_decode_answer(answer, concept_id, run_nr, lemmatize):
     for raw_feature in splitted_features:
         preprocessed_feature = preprocess_feature(raw_feature)
         
-        decoded_features, rule_changes = run_rules(preprocessed_feature, concept_id)
+        decoded_features, rule_changes = run_rules(preprocessed_feature, concept_id, nlp)
         rules_list += rule_changes
 
         if decoded_features:
@@ -77,7 +75,7 @@ def split_and_decode_answer(answer, concept_id, run_nr, lemmatize):
 
     return decoded_feature_list, rules_list
 
-def decode_batch(answers_df, batch_nr, lemmatize):
+def decode_batch(answers_df, batch_nr, lemmatize, nlp):
     decoded_rows = []
     rules_changes = []
     print('Start batch %s' % str(batch_nr))
@@ -85,7 +83,7 @@ def decode_batch(answers_df, batch_nr, lemmatize):
         print('Batch %s: #%s of %s' % (str(batch_nr), str(row.Index), answers_df.shape[0])) if row.Index % 100 == 0 else ''
         concept_id = row.concept_id
         answer = row.answer
-        decoded_feature_list, batch_rules_changes = split_and_decode_answer(answer, concept_id, row.run_nr, lemmatize)
+        decoded_feature_list, batch_rules_changes = split_and_decode_answer(answer, concept_id, row.run_nr, lemmatize, nlp)
         decoded_rows += decoded_feature_list
         rules_changes += batch_rules_changes
     print(f'Batch {batch_nr} done')
@@ -96,13 +94,15 @@ def filter_two_occ(run_nrs):
     return amount_run_features_occured
 
 def decode_answers(answers_df, lemmatize, number_of_parallel_jobs, keep_duplicates_per_concept, output_dir):
+    nlp = spacy.load('en_core_web_sm')
+
     decoded_rows = []
     rules_changes = []
 
     if number_of_parallel_jobs > 1:
         dfs = np.array_split(answers_df, number_of_parallel_jobs)
         with concurrent.futures.ProcessPoolExecutor(max_workers=n) as executor:
-            future = [executor.submit(decode_batch, df, i, lemmatize) for i, df in enumerate(dfs)]
+            future = [executor.submit(decode_batch, df, i, lemmatize, nlp) for i, df in enumerate(dfs)]
             for future in concurrent.futures.as_completed(future):
                 print('Get result')
                 result = future.result()

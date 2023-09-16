@@ -1,10 +1,7 @@
 from copy import deepcopy
 from semantic_norm_generator.decoding import helper as helper
 
-import spacy
-nlp = spacy.load('en_core_web_sm')
-
-def extract_or_pronom_verb(feature):
+def extract_or_pronom_verb(feature, nlp):
     list_of_words = helper.tokenize(feature)
     tagged_feature = nlp(feature)
     extracted_list_of_words = []
@@ -16,7 +13,7 @@ def extract_or_pronom_verb(feature):
                 extracted_list_of_words.append(helper.combine_feature_list_to_string(list_of_words[:i]))
     return extracted_list_of_words
 
-def extract_or_noun_adjective(feature):
+def extract_or_noun_adjective(feature, nlp):
     list_of_words = helper.tokenize(feature)
     tagged_feature = nlp(feature)
     extracted_list_of_words = []
@@ -32,7 +29,7 @@ def extract_or_noun_adjective(feature):
                 extracted_list_of_words.append(helper.combine_feature_list_to_string(first_feature))
     return extracted_list_of_words
 
-def extract_that(feature):
+def extract_that(feature, nlp):
     list_of_words = helper.tokenize(feature)
     tagged_feature = nlp(feature)
     extracted_list_of_words = [] 
@@ -51,7 +48,7 @@ def extract_that(feature):
                 extracted_list_of_words.append(helper.combine_feature_list_to_string(first_feature))
     return extracted_list_of_words
 
-def extract_adjective_verb(feature):
+def extract_adjective_verb(feature, nlp):
     # it is a big tree -> a big tree -> a tree / is big
     list_of_words = helper.tokenize(feature)
     tagged_feature = nlp(feature)
@@ -81,7 +78,7 @@ def extract_adjective_verb(feature):
 
     return extracted_list_of_words
 
-def extract_and(feature):
+def extract_and(feature, nlp):
     # it is an animal and a dog -> is a dog 
     # they are animals and dogs -> are dogs
     # it is green and black -> is black
