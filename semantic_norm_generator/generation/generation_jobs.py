@@ -39,3 +39,12 @@ def yield_generation_jobs(raw_feature_path, train_dir, retrival_path, number_run
                 'question': question
             }
             yield job
+
+def yield_generation_jobs_in_batches(raw_feature_path, train_dir, retrival_path, number_runs):
+    batches = []
+    for job in yield_generation_jobs(raw_feature_path, train_dir, retrival_path, number_runs):
+        batches.append(job)
+
+        if len(batches) == 16:
+            yield batches
+            batches = []

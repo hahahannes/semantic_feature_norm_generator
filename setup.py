@@ -13,6 +13,7 @@ setup(
         "anthropic==0.3.6",
         "inflect",
         "mlconjug3",
-        "accelerate"
+        "accelerate",
+        "bitsandbytes==0.41.0"
     ],
 )

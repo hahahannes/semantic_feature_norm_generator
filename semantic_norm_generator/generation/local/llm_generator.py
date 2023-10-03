@@ -8,7 +8,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 import transformers
 import torch
 
-from semantic_norm_generator.generation.generation_jobs import yield_generation_jobs
+from semantic_norm_generator.generation.generation_jobs import yield_generation_jobs, yield_generation_jobs_in_batches
 from semantic_norm_generator.generation.priming import generate_single_prime_sentence
 
 class LLMGenerator():
@@ -37,10 +37,13 @@ class LLMGenerator():
         )
 
         print("load model")
-        model = AutoModelForCausalLM.from_pretrained(
+        self.model = AutoModelForCausalLM.from_pretrained(
             model_name_or_path, 
             trust_remote_code=True, 
             device_map="auto", 
+            #torch_dtype=torch.float16
+
+            # in case of memory run out
             load_in_4bit=True,
             quantization_config=BitsAndBytesConfig(
                 load_in_4bit=True,
@@ -50,47 +53,60 @@ class LLMGenerator():
 
         self.pipeline = transformers.pipeline(
             "text-generation",
-            model=model,
+            model=self.model,
             tokenizer=self.tokenizer,
             #torch_dtype=torch.bfloat16,
             trust_remote_code=True,
             device_map="auto"
         )
+        self.pipeline.tokenizer.pad_token_id = self.pipeline.model.config.eos_token_id
 
     def run(self):
         print("Run Generation")
         
-        start = time.time()
-
         with open(self.raw_feature_path, 'a') as f:
-            for job in yield_generation_jobs(self.raw_feature_path, self.train_dir, self.retrieval_path, self.number_runs):
-                priming = job['priming']
-                question = job['question']
-                concept = job['concept']
-                concept_id = job['concept_id']
-                run_nr = job['run_nr']
+            for jobs in yield_generation_jobs_in_batches(self.raw_feature_path, self.train_dir, self.retrieval_path, self.number_runs):
+                prompts = []
+                for job in jobs:
+                    priming = job['priming']
+                    question = job['question']
+                    concept = job['concept']
+                    concept_id = job['concept_id']
+                    run_nr = job['run_nr']
 
-                text = generate_single_prime_sentence(priming, question)
-                #"Girafatron is obsessed with giraffes, the most glorious animal on the face of this Earth. Giraftron believes all other animals are irrelevant when compared to the glorious majesty of the giraffe.\nDaniel: Hello, Girafatron!\nGirafatron:",
+                    prompt = generate_single_prime_sentence(priming, question)
+                    prompts.append(prompt)
                 
-                sequences = self.pipeline(
-                    text,
+                start = time.time()
+                outputs = self.pipeline(
+                    prompts,
+                    batch_size=8,
                     max_new_tokens=70,
                     do_sample=True,
                     temperature=0.5,
                     top_p=1.0,
                     num_return_sequences=1,
-                    eos_token_id=self.tokenizer.eos_token_id,
+                    return_full_text=False, # only get completion
+                    #eos_token_id=self.tokenizer.eos_token_id
                 )
                 end = time.time()
-                print(end-start)
+                print(f"Took {end-start}s")
+                print(outputs)
 
-                answer = sequences[0]['generated_text'].split(question, 1)[1]
-                print(f"Result: {answer}")
+                for batch_index, job in enumerate(jobs):
+                    priming = job['priming']
+                    question = job['question']
+                    concept = job['concept']
+                    concept_id = job['concept_id']
+                    run_nr = job['run_nr']
 
-                text = f'{concept},"{answer}",{concept_id},{run_nr}'
-                f.write(text + '\n')
-                f.flush()
+                    for output in outputs[batch_index]:
+                        answer = output['generated_text']
+                        print(f"Result: {answer}")
+
+                        text = f'{concept},"{answer}",{concept_id},{run_nr}'
+                        f.write(text + '\n')
+                        f.flush()
 
     # TODO nicht noetig da beim einlesen 
     # spaeter vllt lieber hier machen und bei generation_jobs rausnehmen
