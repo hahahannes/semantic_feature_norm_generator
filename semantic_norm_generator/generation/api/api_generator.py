@@ -7,6 +7,7 @@ import argparse
 import multiprocessing as mp 
 
 from semantic_norm_generator.generation.generation_jobs import yield_generation_jobs
+from semantic_norm_generator.generation.answer_processing import escape_answer
 
 class APIGenerator():
     def __init__(
@@ -71,10 +72,6 @@ class APIGenerator():
         pool.close()
         pool.join()
 
-
-    def escape_answer(self, text):
-        return text.replace('\n', '').replace('"', '""')
-
     def worker(self, i, job_queue, output_queue, model):
         print(f'start worker {i}')
         while 1:
@@ -85,7 +82,7 @@ class APIGenerator():
             priming = job['priming']
             question = job['question']
             answer = self.make_request(priming, model, question)
-            answer = self.escape_answer(answer)
+            answer = escape_answer(answer)
             job['answer'] = answer
             output_queue.put(job)
         return True 

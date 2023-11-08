@@ -10,6 +10,7 @@ import torch
 
 from semantic_norm_generator.generation.generation_jobs import yield_generation_jobs, yield_generation_jobs_in_batches
 from semantic_norm_generator.generation.priming import generate_single_prime_sentence
+from semantic_norm_generator.generation.answer_processing import escape_answer
 
 class LLMGenerator():
     def __init__(
@@ -102,9 +103,10 @@ class LLMGenerator():
 
                     for output in outputs[batch_index]:
                         answer = output['generated_text']
-                        print(f"Result: {answer}")
+                        escaped_answer = escape_answer(answer)
+                        print(f"Result: {escaped_answer}")
 
-                        text = f'{concept},"{answer}",{concept_id},{run_nr}'
+                        text = f'{concept},"{escaped_answer}",{concept_id},{run_nr}'
                         f.write(text + '\n')
                         f.flush()
 
